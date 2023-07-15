@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 
 // Verbindung zur MongoDB-Datenbank herstellen
 
-require("dotenv").config();
+require("dotenv").config({ path: ".env.local" });
 
 mongoose.connect(process.env.MONGODB_CONNECTION_URL, {
   useNewUrlParser: true,
