@@ -94,3 +94,58 @@ app.post("/api/login", async (req, res) => {
 app.listen(5000, () => {
   console.log("Server gestartet auf Port 5000");
 });
+
+// Login & SignIn
+
+const UserSchema = new mongoose.Schema({
+  username: String,
+  password: String,
+});
+
+const User = mongoose.model("User", UserSchema);
+
+app.post("/api/register", async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    // Überprüfen, ob der Benutzer bereits existiert
+    const existingUser = await User.findOne({ username });
+    if (existingUser) {
+      return res.status(400).json({ error: "Benutzername bereits vergeben" });
+    }
+
+    // Neuen Benutzer erstellen
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = new User({ username, password: hashedPassword });
+    await newUser.save();
+
+    res.json({ message: "Registrierung erfolgreich" });
+  } catch (error) {
+    res.status(500).json({ error: "Fehler bei der Registrierung" });
+  }
+});
+
+app.post("/api/login", async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    // Überprüfen, ob der Benutzer existiert
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(401).json({ error: "Ungültige Anmeldeinformationen" });
+    }
+
+    // Passwort überprüfen
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
+      return res.status(401).json({ error: "Ungültige Anmeldeinformationen" });
+    }
+
+    // JWT-Token generieren und zurückgeben
+    const token = jwt.sign({ userId: user._id }, "secret-key");
+
+    res.json({ token });
+  } catch (error) {
+    res.status(500).json({ error: "Fehler bei der Anmeldung" });
+  }
+});
