@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import Modal from "react-modal";
 
 const STATUS_OPTIONS = [
   "To Do",
@@ -8,6 +9,8 @@ const STATUS_OPTIONS = [
   "Ende",
   "Fragen",
 ];
+
+Modal.setAppElement("#root");
 
 function KanbanBoard() {
   const [tasks, setTasks] = useState([]);
@@ -18,6 +21,8 @@ function KanbanBoard() {
   const [editTaskTitle, setEditTaskTitle] = useState("");
   const [editTaskDescription, setEditTaskDescription] = useState("");
   const [editTaskStatus, setEditTaskStatus] = useState("");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteTaskId, setDeleteTaskId] = useState(null);
 
   useEffect(() => {
     fetchTasks();
@@ -57,6 +62,9 @@ function KanbanBoard() {
       await axios.delete(`/api/tasks/${taskId}`);
       // Refresh the task list after deleting the task
       fetchTasks();
+      // Reset delete modal state
+      setShowDeleteModal(false);
+      setDeleteTaskId(null);
     } catch (error) {
       console.error(error);
     }
@@ -93,6 +101,20 @@ function KanbanBoard() {
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const openDeleteModal = (taskId) => {
+    setShowDeleteModal(true);
+    setDeleteTaskId(taskId);
+  };
+
+  const closeDeleteModal = () => {
+    setShowDeleteModal(false);
+    setDeleteTaskId(null);
+  };
+
+  const confirmDeleteTask = () => {
+    deleteTask(deleteTaskId);
   };
 
   return (
@@ -145,7 +167,9 @@ function KanbanBoard() {
                 <h3>{task.title}</h3>
                 <p>{task.description}</p>
                 <p>Status: {task.status}</p>
-                <button onClick={() => deleteTask(task._id)}>Löschen</button>
+                <button onClick={() => openDeleteModal(task._id)}>
+                  Löschen
+                </button>
                 <button
                   onClick={() =>
                     startEditTask(task._id, task.title, task.description)
@@ -158,6 +182,16 @@ function KanbanBoard() {
           </div>
         ))}
       </div>
+      {/* Delete Modal */}
+      <Modal
+        isOpen={showDeleteModal}
+        onRequestClose={closeDeleteModal}
+        contentLabel="Delete Task"
+      >
+        <p>Sind Sie sicher, dass Sie die Aufgabe löschen möchten?</p>
+        <button onClick={confirmDeleteTask}>Löschen</button>
+        <button onClick={closeDeleteModal}>Abbrechen</button>
+      </Modal>
     </div>
   );
 }
