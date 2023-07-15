@@ -14,6 +14,9 @@ function KanbanBoard() {
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskDescription, setNewTaskDescription] = useState("");
   const [newTaskStatus, setNewTaskStatus] = useState(STATUS_OPTIONS[0]);
+  const [editTaskId, setEditTaskId] = useState(null);
+  const [editTaskTitle, setEditTaskTitle] = useState("");
+  const [editTaskDescription, setEditTaskDescription] = useState("");
 
   useEffect(() => {
     fetchTasks();
@@ -41,8 +44,49 @@ function KanbanBoard() {
       setNewTaskDescription("");
       setNewTaskStatus(STATUS_OPTIONS[0]);
 
-      // Aktualisiere die Aufgabenliste nach dem Erstellen der Aufgabe
+      // Update the task list after creating the task
       fetchTasks();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const deleteTask = async (taskId) => {
+    try {
+      await axios.delete(`/api/tasks/${taskId}`);
+      // Refresh the task list after deleting the task
+      fetchTasks();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const startEditTask = (taskId, taskTitle, taskDescription) => {
+    setEditTaskId(taskId);
+    setEditTaskTitle(taskTitle);
+    setEditTaskDescription(taskDescription);
+  };
+
+  const cancelEditTask = () => {
+    setEditTaskId(null);
+    setEditTaskTitle("");
+    setEditTaskDescription("");
+  };
+
+  const saveEditedTask = async () => {
+    try {
+      const updatedTask = {
+        title: editTaskTitle,
+        description: editTaskDescription,
+        status: newTaskStatus,
+      };
+
+      await axios.put(`/api/tasks/${editTaskId}`, updatedTask);
+      // Refresh the task list after editing the task
+      fetchTasks();
+
+      // Reset edit mode
+      cancelEditTask();
     } catch (error) {
       console.error(error);
     }
@@ -75,13 +119,39 @@ function KanbanBoard() {
         </select>
         <button onClick={createTask}>Aufgabe erstellen</button>
       </div>
-      {/* Anzeige der Aufgaben */}
+      {/* Show Tasks */}
       <div>
         {tasks.map((task) => (
           <div key={task._id}>
-            <h3>{task.title}</h3>
-            <p>{task.description}</p>
-            <p>Status: {task.status}</p>
+            {editTaskId === task._id ? (
+              <div>
+                <input
+                  type="text"
+                  value={editTaskTitle}
+                  onChange={(e) => setEditTaskTitle(e.target.value)}
+                />
+                <textarea
+                  value={editTaskDescription}
+                  onChange={(e) => setEditTaskDescription(e.target.value)}
+                ></textarea>
+                <button onClick={saveEditedTask}>Speichern</button>
+                <button onClick={cancelEditTask}>Abbrechen</button>
+              </div>
+            ) : (
+              <div>
+                <h3>{task.title}</h3>
+                <p>{task.description}</p>
+                <p>Status: {task.status}</p>
+                <button onClick={() => deleteTask(task._id)}>Löschen</button>
+                <button
+                  onClick={() =>
+                    startEditTask(task._id, task.title, task.description)
+                  }
+                >
+                  Bearbeiten
+                </button>
+              </div>
+            )}
           </div>
         ))}
       </div>
