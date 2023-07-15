@@ -89,7 +89,7 @@ function KanbanBoard() {
       const updatedTask = {
         title: editTaskTitle,
         description: editTaskDescription,
-        status: newTaskStatus,
+        status: editTaskStatus,
       };
 
       await axios.put(`/api/tasks/${editTaskId}`, updatedTask);
@@ -159,6 +159,16 @@ function KanbanBoard() {
                   value={editTaskDescription}
                   onChange={(e) => setEditTaskDescription(e.target.value)}
                 ></textarea>
+                <select
+                  value={editTaskStatus}
+                  onChange={(e) => setEditTaskStatus(e.target.value)}
+                >
+                  {STATUS_OPTIONS.map((status) => (
+                    <option key={status} value={status}>
+                      {status}
+                    </option>
+                  ))}
+                </select>
                 <button onClick={saveEditedTask}>Speichern</button>
                 <button onClick={cancelEditTask}>Abbrechen</button>
               </div>
