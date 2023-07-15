@@ -17,6 +17,7 @@ function KanbanBoard() {
   const [editTaskId, setEditTaskId] = useState(null);
   const [editTaskTitle, setEditTaskTitle] = useState("");
   const [editTaskDescription, setEditTaskDescription] = useState("");
+  const [editTaskStatus, setEditTaskStatus] = useState("");
 
   useEffect(() => {
     fetchTasks();
@@ -61,16 +62,18 @@ function KanbanBoard() {
     }
   };
 
-  const startEditTask = (taskId, taskTitle, taskDescription) => {
+  const startEditTask = (taskId, taskTitle, taskDescription, taskStatus) => {
     setEditTaskId(taskId);
     setEditTaskTitle(taskTitle);
     setEditTaskDescription(taskDescription);
+    setEditTaskStatus(taskStatus);
   };
 
   const cancelEditTask = () => {
     setEditTaskId(null);
     setEditTaskTitle("");
     setEditTaskDescription("");
+    setEditTaskStatus("");
   };
 
   const saveEditedTask = async () => {

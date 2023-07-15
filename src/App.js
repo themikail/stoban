@@ -4,7 +4,6 @@ import KanbanBoard from "./kanbanboard";
 function App() {
   return (
     <div className="App">
-      {/* Weitere Komponenten */}
       <KanbanBoard />
     </div>
   );
