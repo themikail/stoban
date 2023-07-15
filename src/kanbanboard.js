@@ -14,15 +14,7 @@ Modal.setAppElement("#root");
 
 function KanbanBoard() {
   const [tasks, setTasks] = useState([]);
-  const [newTaskTitle, setNewTaskTitle] = useState("");
-  const [newTaskDescription, setNewTaskDescription] = useState("");
-  const [newTaskStatus, setNewTaskStatus] = useState(STATUS_OPTIONS[0]);
-  const [editTaskId, setEditTaskId] = useState(null);
-  const [editTaskTitle, setEditTaskTitle] = useState("");
-  const [editTaskDescription, setEditTaskDescription] = useState("");
-  const [editTaskStatus, setEditTaskStatus] = useState("");
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [deleteTaskId, setDeleteTaskId] = useState(null);
+  const [sortedTasks, setSortedTasks] = useState({});
 
   useEffect(() => {
     fetchTasks();
@@ -32,9 +24,18 @@ function KanbanBoard() {
     try {
       const response = await axios.get("/api/tasks");
       setTasks(response.data);
+      sortTasksByStatus(response.data);
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const sortTasksByStatus = (tasks) => {
+    const sortedTasks = {};
+    STATUS_OPTIONS.forEach((status) => {
+      sortedTasks[status] = tasks.filter((task) => task.status === status);
+    });
+    setSortedTasks(sortedTasks);
   };
 
   const createTask = async () => {
@@ -62,9 +63,6 @@ function KanbanBoard() {
       await axios.delete(`/api/tasks/${taskId}`);
       // Refresh the task list after deleting the task
       fetchTasks();
-      // Reset delete modal state
-      setShowDeleteModal(false);
-      setDeleteTaskId(null);
     } catch (error) {
       console.error(error);
     }
@@ -113,9 +111,32 @@ function KanbanBoard() {
     setDeleteTaskId(null);
   };
 
-  const confirmDeleteTask = () => {
-    deleteTask(deleteTaskId);
+  const confirmDeleteTask = async () => {
+    try {
+      await axios.delete(`/api/tasks/${deleteTaskId}`);
+      // Refresh the task list after deleting the task
+      fetchTasks();
+      // Reset delete modal state
+      closeDeleteModal();
+    } catch (error) {
+      console.error(error);
+    }
   };
+
+  // State for create task form
+  const [newTaskTitle, setNewTaskTitle] = useState("");
+  const [newTaskDescription, setNewTaskDescription] = useState("");
+  const [newTaskStatus, setNewTaskStatus] = useState(STATUS_OPTIONS[0]);
+
+  // State for edit task form
+  const [editTaskId, setEditTaskId] = useState(null);
+  const [editTaskTitle, setEditTaskTitle] = useState("");
+  const [editTaskDescription, setEditTaskDescription] = useState("");
+  const [editTaskStatus, setEditTaskStatus] = useState("");
+
+  // State for delete task modal
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteTaskId, setDeleteTaskId] = useState(null);
 
   return (
     <div>
@@ -146,49 +167,59 @@ function KanbanBoard() {
       </div>
       {/* Show Tasks */}
       <div>
-        {tasks.map((task) => (
-          <div key={task._id}>
-            {editTaskId === task._id ? (
-              <div>
-                <input
-                  type="text"
-                  value={editTaskTitle}
-                  onChange={(e) => setEditTaskTitle(e.target.value)}
-                />
-                <textarea
-                  value={editTaskDescription}
-                  onChange={(e) => setEditTaskDescription(e.target.value)}
-                ></textarea>
-                <select
-                  value={editTaskStatus}
-                  onChange={(e) => setEditTaskStatus(e.target.value)}
-                >
-                  {STATUS_OPTIONS.map((status) => (
-                    <option key={status} value={status}>
-                      {status}
-                    </option>
-                  ))}
-                </select>
-                <button onClick={saveEditedTask}>Speichern</button>
-                <button onClick={cancelEditTask}>Abbrechen</button>
+        {STATUS_OPTIONS.map((status) => (
+          <div key={status}>
+            <h2>{status}</h2>
+            {sortedTasks[status]?.map((task) => (
+              <div key={task._id}>
+                {editTaskId === task._id ? (
+                  <div>
+                    <input
+                      type="text"
+                      value={editTaskTitle}
+                      onChange={(e) => setEditTaskTitle(e.target.value)}
+                    />
+                    <textarea
+                      value={editTaskDescription}
+                      onChange={(e) => setEditTaskDescription(e.target.value)}
+                    ></textarea>
+                    <select
+                      value={editTaskStatus}
+                      onChange={(e) => setEditTaskStatus(e.target.value)}
+                    >
+                      {STATUS_OPTIONS.map((status) => (
+                        <option key={status} value={status}>
+                          {status}
+                        </option>
+                      ))}
+                    </select>
+                    <button onClick={saveEditedTask}>Speichern</button>
+                    <button onClick={cancelEditTask}>Abbrechen</button>
+                  </div>
+                ) : (
+                  <div>
+                    <h3>{task.title}</h3>
+                    <p>{task.description}</p>
+                    <p>Status: {task.status}</p>
+                    <button onClick={() => openDeleteModal(task._id)}>
+                      Löschen
+                    </button>
+                    <button
+                      onClick={() =>
+                        startEditTask(
+                          task._id,
+                          task.title,
+                          task.description,
+                          task.status
+                        )
+                      }
+                    >
+                      Bearbeiten
+                    </button>
+                  </div>
+                )}
               </div>
-            ) : (
-              <div>
-                <h3>{task.title}</h3>
-                <p>{task.description}</p>
-                <p>Status: {task.status}</p>
-                <button onClick={() => openDeleteModal(task._id)}>
-                  Löschen
-                </button>
-                <button
-                  onClick={() =>
-                    startEditTask(task._id, task.title, task.description)
-                  }
-                >
-                  Bearbeiten
-                </button>
-              </div>
-            )}
+            ))}
           </div>
         ))}
       </div>
