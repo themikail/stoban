@@ -4,13 +4,13 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 // Verbindung zur MongoDB-Datenbank herstellen
-mongoose.connect(
-  "mongodb+srv://mikailgokce:guppef1JoCa@cluster0.vsbsss8.mongodb.net/?retryWrites=true&w=majority",
-  {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  }
-);
+
+require("dotenv").config();
+
+mongoose.connect(process.env.MONGODB_CONNECTION_URL, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
 const app = express();
 app.use(express.json());
