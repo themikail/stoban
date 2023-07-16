@@ -20,6 +20,7 @@ const TaskSchema = new mongoose.Schema({
   title: String,
   description: String,
   status: String,
+  color: String,
 });
 
 const Task = mongoose.model("Task", TaskSchema);
@@ -37,8 +38,8 @@ app.get("/api/tasks", async (req, res) => {
 // API-Endpunkt zum Erstellen einer Aufgabe
 app.post("/api/tasks", async (req, res) => {
   try {
-    const { title, description, status } = req.body;
-    const task = new Task({ title, description, status });
+    const { title, description, status, color } = req.body;
+    const task = new Task({ title, description, status, color });
     await task.save();
     res.json(task);
   } catch (error) {
@@ -49,10 +50,10 @@ app.post("/api/tasks", async (req, res) => {
 // API-Endpunkt zum Aktualisieren einer Aufgabe
 app.put("/api/tasks/:id", async (req, res) => {
   try {
-    const { title, description, status } = req.body;
+    const { title, description, status, color } = req.body;
     const task = await Task.findByIdAndUpdate(
       req.params.id,
-      { title, description, status },
+      { title, description, status, color },
       { new: true }
     );
     res.json(task);

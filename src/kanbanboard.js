@@ -45,12 +45,14 @@ function KanbanBoard() {
         title: newTaskTitle,
         description: newTaskDescription,
         status: newTaskStatus,
+        color: newTaskColor,
       };
 
       await axios.post("/api/tasks", newTask);
       setNewTaskTitle("");
       setNewTaskDescription("");
       setNewTaskStatus(STATUS_OPTIONS[0]);
+      setNewTaskColor("");
 
       // Update the task list after creating the task
       fetchTasks();
@@ -69,11 +71,18 @@ function KanbanBoard() {
     }
   };
 
-  const startEditTask = (taskId, taskTitle, taskDescription, taskStatus) => {
+  const startEditTask = (
+    taskId,
+    taskTitle,
+    taskDescription,
+    taskStatus,
+    taskColor
+  ) => {
     setEditTaskId(taskId);
     setEditTaskTitle(taskTitle);
     setEditTaskDescription(taskDescription);
     setEditTaskStatus(taskStatus);
+    setEditTaskColor(taskColor);
   };
 
   const cancelEditTask = () => {
@@ -81,6 +90,7 @@ function KanbanBoard() {
     setEditTaskTitle("");
     setEditTaskDescription("");
     setEditTaskStatus("");
+    setEditTaskColor("");
   };
 
   const saveEditedTask = async () => {
@@ -89,6 +99,7 @@ function KanbanBoard() {
         title: editTaskTitle,
         description: editTaskDescription,
         status: editTaskStatus,
+        color: editTaskColor,
       };
 
       await axios.put(`/api/tasks/${editTaskId}`, updatedTask);
@@ -128,12 +139,14 @@ function KanbanBoard() {
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskDescription, setNewTaskDescription] = useState("");
   const [newTaskStatus, setNewTaskStatus] = useState(STATUS_OPTIONS[0]);
+  const [newTaskColor, setNewTaskColor] = useState("");
 
   // State for edit task form
   const [editTaskId, setEditTaskId] = useState(null);
   const [editTaskTitle, setEditTaskTitle] = useState("");
   const [editTaskDescription, setEditTaskDescription] = useState("");
   const [editTaskStatus, setEditTaskStatus] = useState("");
+  const [editTaskColor, setEditTaskColor] = useState("");
 
   // State for delete task modal
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -165,6 +178,12 @@ function KanbanBoard() {
               </option>
             ))}
           </select>
+          <input
+            type="color"
+            value={newTaskColor}
+            onChange={(e) => setNewTaskColor(e.target.value)}
+          />
+
           <button onClick={createTask}>Aufgabe erstellen</button>
         </div>
         {/* Show Tasks */}
@@ -198,6 +217,11 @@ function KanbanBoard() {
                             </option>
                           ))}
                         </select>
+                        <input
+                          type="color"
+                          value={editTaskColor}
+                          onChange={(e) => setEditTaskColor(e.target.value)}
+                        />
                         <button onClick={saveEditedTask}>Speichern</button>
                         <button onClick={cancelEditTask}>Abbrechen</button>
                       </div>
@@ -206,6 +230,13 @@ function KanbanBoard() {
                         <h3>{task.title}</h3>
                         <p>{task.description}</p>
                         <p>Status: {task.status}</p>
+                        <div
+                          style={{
+                            backgroundColor: task.color,
+                            width: "80px",
+                            height: "20px",
+                          }}
+                        ></div>
                         <button onClick={() => openDeleteModal(task._id)}>
                           Löschen
                         </button>
@@ -215,7 +246,8 @@ function KanbanBoard() {
                               task._id,
                               task.title,
                               task.description,
-                              task.status
+                              task.status,
+                              task.color
                             )
                           }
                         >
