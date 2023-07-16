@@ -140,110 +140,119 @@ function KanbanBoard() {
   const [deleteTaskId, setDeleteTaskId] = useState(null);
 
   return (
-    <div>
-      <h1>Kanban Board</h1>
+    <Main>
       <div>
-        <input
-          type="text"
-          value={newTaskTitle}
-          onChange={(e) => setNewTaskTitle(e.target.value)}
-          placeholder="Titel eingeben"
-        />
-        <textarea
-          value={newTaskDescription}
-          onChange={(e) => setNewTaskDescription(e.target.value)}
-          placeholder="Beschreibung eingeben"
-        ></textarea>
-        <select
-          value={newTaskStatus}
-          onChange={(e) => setNewTaskStatus(e.target.value)}
+        <h1>Kanban Board</h1>
+        <div>
+          <input
+            type="text"
+            value={newTaskTitle}
+            onChange={(e) => setNewTaskTitle(e.target.value)}
+            placeholder="Titel eingeben"
+          />
+          <textarea
+            value={newTaskDescription}
+            onChange={(e) => setNewTaskDescription(e.target.value)}
+            placeholder="Beschreibung eingeben"
+          ></textarea>
+          <select
+            value={newTaskStatus}
+            onChange={(e) => setNewTaskStatus(e.target.value)}
+          >
+            {STATUS_OPTIONS.map((status) => (
+              <option key={status} value={status}>
+                {status}
+              </option>
+            ))}
+          </select>
+          <button onClick={createTask}>Aufgabe erstellen</button>
+        </div>
+        {/* Show Tasks */}
+        <div>
+          <StatusHead>
+            {STATUS_OPTIONS.map((status) => (
+              <div key={status}>
+                <Status>{status}</Status>
+                {sortedTasks[status]?.map((task) => (
+                  <div key={task._id}>
+                    {editTaskId === task._id ? (
+                      <div>
+                        <input
+                          type="text"
+                          value={editTaskTitle}
+                          onChange={(e) => setEditTaskTitle(e.target.value)}
+                        />
+                        <textarea
+                          value={editTaskDescription}
+                          onChange={(e) =>
+                            setEditTaskDescription(e.target.value)
+                          }
+                        ></textarea>
+                        <select
+                          value={editTaskStatus}
+                          onChange={(e) => setEditTaskStatus(e.target.value)}
+                        >
+                          {STATUS_OPTIONS.map((status) => (
+                            <option key={status} value={status}>
+                              {status}
+                            </option>
+                          ))}
+                        </select>
+                        <button onClick={saveEditedTask}>Speichern</button>
+                        <button onClick={cancelEditTask}>Abbrechen</button>
+                      </div>
+                    ) : (
+                      <div>
+                        <h3>{task.title}</h3>
+                        <p>{task.description}</p>
+                        <p>Status: {task.status}</p>
+                        <button onClick={() => openDeleteModal(task._id)}>
+                          Löschen
+                        </button>
+                        <button
+                          onClick={() =>
+                            startEditTask(
+                              task._id,
+                              task.title,
+                              task.description,
+                              task.status
+                            )
+                          }
+                        >
+                          Bearbeiten
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ))}
+          </StatusHead>
+        </div>
+        {/* Delete Modal */}
+        <Modal
+          isOpen={showDeleteModal}
+          onRequestClose={closeDeleteModal}
+          contentLabel="Delete Task"
         >
-          {STATUS_OPTIONS.map((status) => (
-            <option key={status} value={status}>
-              {status}
-            </option>
-          ))}
-        </select>
-        <button onClick={createTask}>Aufgabe erstellen</button>
+          <p>Sind Sie sicher, dass Sie die Aufgabe löschen möchten?</p>
+          <button onClick={confirmDeleteTask}>Löschen</button>
+          <button onClick={closeDeleteModal}>Abbrechen</button>
+        </Modal>
       </div>
-      {/* Show Tasks */}
-      <div>
-        <StatusHead>
-          {STATUS_OPTIONS.map((status) => (
-            <div key={status}>
-              <Status>{status}</Status>
-              {sortedTasks[status]?.map((task) => (
-                <div key={task._id}>
-                  {editTaskId === task._id ? (
-                    <div>
-                      <input
-                        type="text"
-                        value={editTaskTitle}
-                        onChange={(e) => setEditTaskTitle(e.target.value)}
-                      />
-                      <textarea
-                        value={editTaskDescription}
-                        onChange={(e) => setEditTaskDescription(e.target.value)}
-                      ></textarea>
-                      <select
-                        value={editTaskStatus}
-                        onChange={(e) => setEditTaskStatus(e.target.value)}
-                      >
-                        {STATUS_OPTIONS.map((status) => (
-                          <option key={status} value={status}>
-                            {status}
-                          </option>
-                        ))}
-                      </select>
-                      <button onClick={saveEditedTask}>Speichern</button>
-                      <button onClick={cancelEditTask}>Abbrechen</button>
-                    </div>
-                  ) : (
-                    <div>
-                      <h3>{task.title}</h3>
-                      <p>{task.description}</p>
-                      <p>Status: {task.status}</p>
-                      <button onClick={() => openDeleteModal(task._id)}>
-                        Löschen
-                      </button>
-                      <button
-                        onClick={() =>
-                          startEditTask(
-                            task._id,
-                            task.title,
-                            task.description,
-                            task.status
-                          )
-                        }
-                      >
-                        Bearbeiten
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          ))}
-        </StatusHead>
-      </div>
-      {/* Delete Modal */}
-      <Modal
-        isOpen={showDeleteModal}
-        onRequestClose={closeDeleteModal}
-        contentLabel="Delete Task"
-      >
-        <p>Sind Sie sicher, dass Sie die Aufgabe löschen möchten?</p>
-        <button onClick={confirmDeleteTask}>Löschen</button>
-        <button onClick={closeDeleteModal}>Abbrechen</button>
-      </Modal>
-    </div>
+    </Main>
   );
 }
 
 export default KanbanBoard;
 
+const Main = styled.div`
+  padding: 20px 20px 0 20px;
+`;
+
 const StatusHead = styled.div`
   display: flex;
+  justify-content: space-between;
 `;
 
 const Status = styled.h2``;
