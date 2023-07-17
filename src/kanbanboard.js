@@ -140,7 +140,7 @@ function KanbanBoard() {
   const [newTaskDescription, setNewTaskDescription] = useState("");
   const [newTaskStatus, setNewTaskStatus] = useState(STATUS_OPTIONS[0]);
   const [newTaskColor, setNewTaskColor] = useState("");
-  const [isOpen, setIsOpen] = useState(false);
+  const [isNewTaskDropdownOpen, setIsNewTaskDropdownOpen] = useState(false);
 
   // State for edit task form
   const [editTaskId, setEditTaskId] = useState(null);
@@ -148,18 +148,28 @@ function KanbanBoard() {
   const [editTaskDescription, setEditTaskDescription] = useState("");
   const [editTaskStatus, setEditTaskStatus] = useState("");
   const [editTaskColor, setEditTaskColor] = useState("");
+  const [isEditTaskDropdownOpen, setIsEditTaskDropdownOpen] = useState(false);
 
   // State for delete task modal
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteTaskId, setDeleteTaskId] = useState(null);
 
-  const handleToggleDropdown = () => {
-    setIsOpen(!isOpen);
+  const handleToggleNewTaskDropdown = () => {
+    setIsNewTaskDropdownOpen(!isNewTaskDropdownOpen);
+  };
+
+  const handleToggleEditTaskDropdown = () => {
+    setIsEditTaskDropdownOpen(!isEditTaskDropdownOpen);
   };
 
   const handleColorOptionClick = (color) => {
-    setNewTaskColor(color);
-    setIsOpen(false);
+    if (isNewTaskDropdownOpen) {
+      setNewTaskColor(color);
+      setIsNewTaskDropdownOpen(false);
+    } else if (isEditTaskDropdownOpen) {
+      setEditTaskColor(color);
+      setIsEditTaskDropdownOpen(false);
+    }
   };
 
   return (
@@ -189,21 +199,21 @@ function KanbanBoard() {
             ))}
           </select>
           <ColorDropdownContainer>
-            <ColorDropdownButton onClick={handleToggleDropdown}>
+            <ColorDropdownButton onClick={handleToggleNewTaskDropdown}>
               <ColorCircle style={{ backgroundColor: newTaskColor }} />
             </ColorDropdownButton>
-            <ColorOptions isOpen={isOpen}>
+            <ColorOptions isOpen={isNewTaskDropdownOpen}>
               <ColorOption onClick={() => handleColorOptionClick("red")}>
                 <ColorCircle style={{ backgroundColor: "red" }} />
-                {/* Rot */}
+                Rot
               </ColorOption>
               <ColorOption onClick={() => handleColorOptionClick("blue")}>
                 <ColorCircle style={{ backgroundColor: "blue" }} />
-                {/* Blau */}
+                Blau
               </ColorOption>
               <ColorOption onClick={() => handleColorOptionClick("green")}>
                 <ColorCircle style={{ backgroundColor: "green" }} />
-                {/* Grün */}
+                Grün
               </ColorOption>
             </ColorOptions>
             <ColorSelect
@@ -249,11 +259,47 @@ function KanbanBoard() {
                             </option>
                           ))}
                         </select>
-                        <input
-                          type="color"
-                          value={editTaskColor}
-                          onChange={(e) => setEditTaskColor(e.target.value)}
-                        />
+                        <ColorDropdownContainer>
+                          <ColorDropdownButton
+                            onClick={handleToggleEditTaskDropdown}
+                          >
+                            <ColorCircle
+                              style={{ backgroundColor: editTaskColor }}
+                            />
+                          </ColorDropdownButton>
+                          <ColorOptions isOpen={isEditTaskDropdownOpen}>
+                            <ColorOption
+                              onClick={() => handleColorOptionClick("red")}
+                            >
+                              <ColorCircle style={{ backgroundColor: "red" }} />
+                              Rot
+                            </ColorOption>
+                            <ColorOption
+                              onClick={() => handleColorOptionClick("blue")}
+                            >
+                              <ColorCircle
+                                style={{ backgroundColor: "blue" }}
+                              />
+                              Blau
+                            </ColorOption>
+                            <ColorOption
+                              onClick={() => handleColorOptionClick("green")}
+                            >
+                              <ColorCircle
+                                style={{ backgroundColor: "green" }}
+                              />
+                              Grün
+                            </ColorOption>
+                          </ColorOptions>
+                          <ColorSelect
+                            value={editTaskColor}
+                            onChange={(e) => setEditTaskColor(e.target.value)}
+                          >
+                            <option value="red">Rot</option>
+                            <option value="blue">Blau</option>
+                            <option value="green">Grün</option>
+                          </ColorSelect>
+                        </ColorDropdownContainer>
                         <button onClick={saveEditedTask}>Speichern</button>
                         <button onClick={cancelEditTask}>Abbrechen</button>
                       </div>
@@ -318,7 +364,6 @@ const StatusHead = styled.div`
   display: flex;
   justify-content: space-between;
 `;
-
 const Status = styled.h2``;
 
 const ColorDropdownContainer = styled.div`
