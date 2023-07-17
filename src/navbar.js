@@ -14,7 +14,7 @@ function Navbar() {
 
   return (
     <Nav>
-      <Logo>Logo</Logo>
+      <Logo>Stoban</Logo>
       <NavLinks>
         <NavLink>Home</NavLink>
         <NavLink>About</NavLink>
@@ -22,7 +22,6 @@ function Navbar() {
         <NavLink>Contact</NavLink>
       </NavLinks>
       <UserInfo>
-        <NewButton>NEU</NewButton>
         <UserName>{username}</UserName>
         <UserButton onClick={toggleDropdown}>
           <UserPhoto src={userPhoto} alt="User Photo" />
