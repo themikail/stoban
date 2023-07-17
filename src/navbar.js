@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 
 function Navbar() {
-  // example
+  // Angenommen, du hast den Benutzernamen und das Benutzerfoto vom eingeloggten Benutzer
   const username = "Max Mustermann";
   const userPhoto = "https://example.com/user-photo.jpg";
 

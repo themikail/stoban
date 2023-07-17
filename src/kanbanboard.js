@@ -56,6 +56,7 @@ function KanbanBoard() {
 
       // Update the task list after creating the task
       fetchTasks();
+      setIsCreatingTask(false);
     } catch (error) {
       console.error(error);
     }
@@ -141,6 +142,7 @@ function KanbanBoard() {
   const [newTaskStatus, setNewTaskStatus] = useState(STATUS_OPTIONS[0]);
   const [newTaskColor, setNewTaskColor] = useState("");
   const [isNewTaskDropdownOpen, setIsNewTaskDropdownOpen] = useState(false);
+  const [isCreatingTask, setIsCreatingTask] = useState(false);
 
   // State for edit task form
   const [editTaskId, setEditTaskId] = useState(null);
@@ -177,56 +179,64 @@ function KanbanBoard() {
       <div>
         <h1>Kanban Board</h1>
         <div>
-          <input
-            type="text"
-            value={newTaskTitle}
-            onChange={(e) => setNewTaskTitle(e.target.value)}
-            placeholder="Titel eingeben"
-          />
-          <textarea
-            value={newTaskDescription}
-            onChange={(e) => setNewTaskDescription(e.target.value)}
-            placeholder="Beschreibung eingeben"
-          ></textarea>
-          <select
-            value={newTaskStatus}
-            onChange={(e) => setNewTaskStatus(e.target.value)}
-          >
-            {STATUS_OPTIONS.map((status) => (
-              <option key={status} value={status}>
-                {status}
-              </option>
-            ))}
-          </select>
-          <ColorDropdownContainer>
-            <ColorDropdownButton onClick={handleToggleNewTaskDropdown}>
-              <ColorCircle style={{ backgroundColor: newTaskColor }} />
-            </ColorDropdownButton>
-            <ColorOptions isOpen={isNewTaskDropdownOpen}>
-              <ColorOption onClick={() => handleColorOptionClick("red")}>
-                <ColorCircle style={{ backgroundColor: "red" }} />
-                Rot
-              </ColorOption>
-              <ColorOption onClick={() => handleColorOptionClick("blue")}>
-                <ColorCircle style={{ backgroundColor: "blue" }} />
-                Blau
-              </ColorOption>
-              <ColorOption onClick={() => handleColorOptionClick("green")}>
-                <ColorCircle style={{ backgroundColor: "green" }} />
-                Grün
-              </ColorOption>
-            </ColorOptions>
-            <ColorSelect
-              value={newTaskColor}
-              onChange={(e) => setNewTaskColor(e.target.value)}
-            >
-              <option value="red">Rot</option>
-              <option value="blue">Blau</option>
-              <option value="green">Grün</option>
-            </ColorSelect>
-          </ColorDropdownContainer>
-
-          <button onClick={createTask}>Aufgabe erstellen</button>
+          {isCreatingTask ? (
+            <>
+              <input
+                type="text"
+                value={newTaskTitle}
+                onChange={(e) => setNewTaskTitle(e.target.value)}
+                placeholder="Titel eingeben"
+              />
+              <textarea
+                value={newTaskDescription}
+                onChange={(e) => setNewTaskDescription(e.target.value)}
+                placeholder="Beschreibung eingeben"
+              ></textarea>
+              <select
+                value={newTaskStatus}
+                onChange={(e) => setNewTaskStatus(e.target.value)}
+              >
+                {STATUS_OPTIONS.map((status) => (
+                  <option key={status} value={status}>
+                    {status}
+                  </option>
+                ))}
+              </select>
+              <ColorDropdownContainer>
+                <ColorDropdownButton onClick={handleToggleNewTaskDropdown}>
+                  <ColorCircle style={{ backgroundColor: newTaskColor }} />
+                </ColorDropdownButton>
+                <ColorOptions isOpen={isNewTaskDropdownOpen}>
+                  <ColorOption onClick={() => handleColorOptionClick("red")}>
+                    <ColorCircle style={{ backgroundColor: "red" }} />
+                    Rot
+                  </ColorOption>
+                  <ColorOption onClick={() => handleColorOptionClick("blue")}>
+                    <ColorCircle style={{ backgroundColor: "blue" }} />
+                    Blau
+                  </ColorOption>
+                  <ColorOption onClick={() => handleColorOptionClick("green")}>
+                    <ColorCircle style={{ backgroundColor: "green" }} />
+                    Grün
+                  </ColorOption>
+                </ColorOptions>
+                <ColorSelect
+                  value={newTaskColor}
+                  onChange={(e) => setNewTaskColor(e.target.value)}
+                >
+                  <option value="red">Rot</option>
+                  <option value="blue">Blau</option>
+                  <option value="green">Grün</option>
+                </ColorSelect>
+              </ColorDropdownContainer>
+              <button onClick={createTask}>Aufgabe erstellen</button>
+              <button onClick={() => setIsCreatingTask(false)}>
+                Abbrechen
+              </button>
+            </>
+          ) : (
+            <button onClick={() => setIsCreatingTask(true)}>NEU</button>
+          )}
         </div>
         {/* Show Tasks */}
         <div>
